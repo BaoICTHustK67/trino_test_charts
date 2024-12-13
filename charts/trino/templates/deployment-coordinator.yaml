@@ -131,6 +131,14 @@ spec:
         - name: {{ .Chart.Name }}-coordinator
           image: {{ include "trino.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command :
+            - sh
+            - -c
+            - |
+              echo "Importing certificate into truststore..."
+              keytool -import -trustcacerts -alias opensearch -file /etc/trino/truststore/truststoreopensearch-cert.pem \
+              -keystore "$JAVA_HOME/lib/security/cacerts" -storepass changeit -noprompt
+              opt/ranger/ranger-trino-plugin/entrypoint-trino.sh
           securityContext:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}
           env:
